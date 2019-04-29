@@ -9,11 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 
 public class GetModuleEvents extends HesperidesScenario implements En {
 
@@ -23,20 +18,8 @@ public class GetModuleEvents extends HesperidesScenario implements En {
     private ModuleBuilder moduleBuilder;
 
     public GetModuleEvents() {
-
         When("^I( try to)? get the events of this module$", (String tryTo) -> {
             testContext.responseEntity = getModuleEvents(moduleBuilder.build(), getResponseType(tryTo, EventOutput[].class));
-        });
-
-        Then("^(\\d+) event(?: is|s are) returned$", (Integer nbEvents) -> {
-            assertOK();
-            EventOutput[] events = (EventOutput[]) testContext.getResponseBody();
-            assertEquals(nbEvents.intValue(), events.length);
-        });
-
-        Then("^event at index (\\d+) is a (.*) event type$", (Integer index, String eventType) -> {
-            EventOutput[] events = (EventOutput[]) testContext.getResponseBody();
-            assertThat(events[index], hasProperty("type", endsWith(eventType)));
         });
     }
 

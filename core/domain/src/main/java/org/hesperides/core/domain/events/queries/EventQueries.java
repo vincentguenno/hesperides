@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 @Component
 public class EventQueries extends AxonQueries {
 
-
     protected EventQueries(QueryGateway queryGateway) {
         super(queryGateway);
     }

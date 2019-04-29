@@ -64,6 +64,7 @@ public class CreatePlatforms extends HesperidesScenario implements En {
 
     @Given("^an existing( prod)? platform" +
             "(?: named \"([^\"]*)\")?" +
+            "(?: (?:and|with) application name \"([^\"]*)\")?" +
             "( with this module)?" +
             "(?: in logical group \"([^\"]*)\")?" +
             "( (?:and|with) an instance)?" +
@@ -77,6 +78,7 @@ public class CreatePlatforms extends HesperidesScenario implements En {
             "( (?:and|with) filename and location values)?$")
     public void givenAnExistingPlatform(String isProd,
                                         String platformName,
+                                        String applicationName,
                                         String withThisModule,
                                         String logicalGroup,
                                         String withAnInstance,
@@ -93,6 +95,10 @@ public class CreatePlatforms extends HesperidesScenario implements En {
         if (isNotEmpty(isProd)) {
             platformBuilder.withIsProductionPlatform(true);
             commonSteps.setAuthUserRole("prod");
+        }
+
+        if (isNotEmpty(applicationName)) {
+            platformBuilder.withApplicationName(applicationName);
         }
 
         if (isNotEmpty(platformName)) {
