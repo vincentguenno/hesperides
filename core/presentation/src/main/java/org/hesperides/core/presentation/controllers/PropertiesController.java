@@ -13,6 +13,7 @@ import org.hesperides.core.domain.platforms.queries.views.properties.GlobalPrope
 import org.hesperides.core.domain.platforms.queries.views.properties.PropertyWithDetailsView;
 import org.hesperides.core.domain.security.entities.User;
 import org.hesperides.core.presentation.io.platforms.InstancesModelOutput;
+import org.hesperides.core.presentation.io.platforms.properties.DetailedPropertiesOutput;
 import org.hesperides.core.presentation.io.platforms.properties.GlobalPropertyUsageOutput;
 import org.hesperides.core.presentation.io.platforms.properties.PropertiesIO;
 import org.hesperides.core.presentation.io.platforms.properties.PropertiesWithDetailsOutput;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -69,6 +71,17 @@ public class PropertiesController extends AbstractController {
             responseEntity = ResponseEntity.ok(propertiesIO);
         }
         return responseEntity;
+    }
+
+    @ApiOperation("Get detailed properties of a platform or a module")
+    @GetMapping("/{application_name}/platforms/{platform_name}/detailed_properties")
+    public ResponseEntity<DetailedPropertiesOutput> getValuedProperties(Authentication authentication,
+                                                                        @PathVariable("application_name") final String applicationName,
+                                                                        @PathVariable("platform_name") final String platformName,
+                                                                        @RequestParam(value = "properties_path", required = false) final String propertiesPath) {
+        Platform.Key platformKey = new Platform.Key(applicationName, platformName);
+        User authenticatedUser = new User(authentication);
+        throw new NotImplementedException();
     }
 
     @GetMapping("/{application_name}/platforms/{platform_name}/properties/instance_model")
