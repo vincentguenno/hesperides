@@ -67,7 +67,13 @@ public class DetailedPropertiesView {
         List<DetailedPropertyView> referencedGlobalProperties;
         boolean isNotUsed;
 
-        public ModuleDetailedPropertyView(String name, String storedValue, String finalValue, String defaultValue, List<PropertyView> propertyModels) {
+        public ModuleDetailedPropertyView(
+                String name,
+                String storedValue,
+                String finalValue,
+                String defaultValue,
+                List<PropertyView> propertyModels,
+                List<ValuedPropertyView> globalProperties) {
             super(name, storedValue, finalValue);
             this.defaultValue = defaultValue;
             this.isRequired = !isEmpty(propertyModels) && propertyModels.get(0).isRequired();

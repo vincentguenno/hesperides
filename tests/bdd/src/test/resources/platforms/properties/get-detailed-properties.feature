@@ -147,3 +147,9 @@ Feature: Get detailed properties
       | not-used-property | not-used-value | not-used-value |              | false      | false      |         |         |                          | true      |
 
   Scenario: get the detail of property with multiple models
+
+  Scenario: with a global property referencing another global property
+
+  Scenario: multiple modules
+
+  Scenario: nested properties

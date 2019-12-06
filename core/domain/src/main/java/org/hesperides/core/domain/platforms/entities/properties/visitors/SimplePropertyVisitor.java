@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hesperides.core.domain.platforms.entities.properties.ValuedPropertyTransformation;
 import org.hesperides.core.domain.platforms.entities.properties.diff.PropertiesDiff.ComparisonMode;
 import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.ModuleDetailedPropertyView;
-import org.hesperides.core.domain.platforms.queries.views.properties.PropertyWithDetailsView;
 import org.hesperides.core.domain.platforms.queries.views.properties.ValuedPropertyView;
 import org.hesperides.core.domain.templatecontainers.queries.AbstractPropertyView;
 import org.hesperides.core.domain.templatecontainers.queries.PropertyView;
@@ -155,13 +154,7 @@ public class SimplePropertyVisitor implements PropertyVisitor {
         return Objects.hash(propertyModels, propertyValue);
     }
 
-    PropertyWithDetailsView getPropertyWithDetails() {
-        String finalValue = getValueOrDefault().orElse(null);
-        String defaultValue = getDefaultValue().orElse("");
-        return new PropertyWithDetailsView(getName(), initialValue, finalValue, defaultValue, transformations);
-    }
-
-    public ModuleDetailedPropertyView toModuleDetailedProperty() {
+    public ModuleDetailedPropertyView toModuleDetailedProperty(List<ValuedPropertyView> globalProperties) {
         String finalValue = getValueOrDefault().orElse(null);
         String defaultValue = getDefaultValue().orElse(null);
         return new ModuleDetailedPropertyView(
@@ -169,6 +162,7 @@ public class SimplePropertyVisitor implements PropertyVisitor {
                 initialValue,
                 finalValue,
                 defaultValue,
-                propertyModels);
+                propertyModels,
+                globalProperties);
     }
 }

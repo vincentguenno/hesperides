@@ -8,7 +8,6 @@ import org.hesperides.core.domain.platforms.entities.properties.diff.PropertiesD
 import org.hesperides.core.domain.platforms.queries.views.properties.AbstractValuedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.ModuleDetailedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.IterableValuedPropertyView;
-import org.hesperides.core.domain.platforms.queries.views.properties.PropertyWithDetailsView;
 import org.hesperides.core.domain.platforms.queries.views.properties.ValuedPropertyView;
 import org.hesperides.core.domain.templatecontainers.queries.AbstractPropertyView;
 import org.hesperides.core.domain.templatecontainers.queries.IterablePropertyView;
@@ -221,21 +220,12 @@ public class PropertyVisitorsSequence {
                         propertyVisitor.equals(propertyVisitorMap.get(propertyVisitor.getName()), comparisonMode));
     }
 
-    public List<PropertyWithDetailsView> getPropertiesWithDetails() {
+    public List<ModuleDetailedPropertyView> toModuleDetailedProperties(List<ValuedPropertyView> globalProperties) {
         return properties.stream()
                 // On ne gère pour l'instant que les propriétés simples
                 .filter(SimplePropertyVisitor.class::isInstance)
                 .map(SimplePropertyVisitor.class::cast)
-                .map(SimplePropertyVisitor::getPropertyWithDetails)
-                .collect(Collectors.toList());
-    }
-
-    public List<ModuleDetailedPropertyView> toModuleDetailedProperties() {
-        return properties.stream()
-                // On ne gère pour l'instant que les propriétés simples
-                .filter(SimplePropertyVisitor.class::isInstance)
-                .map(SimplePropertyVisitor.class::cast)
-                .map(SimplePropertyVisitor::toModuleDetailedProperty)
+                .map(simplePropertyVisitor -> simplePropertyVisitor.toModuleDetailedProperty(globalProperties))
                 .collect(Collectors.toList());
     }
 }
