@@ -9,6 +9,7 @@ import org.hesperides.core.domain.platforms.entities.Platform;
 import org.hesperides.core.domain.platforms.entities.properties.AbstractValuedProperty;
 import org.hesperides.core.domain.platforms.entities.properties.diff.PropertiesDiff;
 import org.hesperides.core.domain.platforms.queries.views.properties.AbstractValuedPropertyView;
+import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView;
 import org.hesperides.core.domain.platforms.queries.views.properties.GlobalPropertyUsageView;
 import org.hesperides.core.domain.platforms.queries.views.properties.PropertyWithDetailsView;
 import org.hesperides.core.domain.security.entities.User;
@@ -22,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -75,13 +75,15 @@ public class PropertiesController extends AbstractController {
 
     @ApiOperation("Get detailed properties of a platform or a module")
     @GetMapping("/{application_name}/platforms/{platform_name}/detailed_properties")
-    public ResponseEntity<DetailedPropertiesOutput> getValuedProperties(Authentication authentication,
-                                                                        @PathVariable("application_name") final String applicationName,
-                                                                        @PathVariable("platform_name") final String platformName,
-                                                                        @RequestParam(value = "properties_path", required = false) final String propertiesPath) {
+    public ResponseEntity<DetailedPropertiesOutput> getDetailedProperties(Authentication authentication,
+                                                                          @PathVariable("application_name") final String applicationName,
+                                                                          @PathVariable("platform_name") final String platformName,
+                                                                          @RequestParam(value = "properties_path", required = false) final String propertiesPath) {
         Platform.Key platformKey = new Platform.Key(applicationName, platformName);
-        User authenticatedUser = new User(authentication);
-        throw new NotImplementedException();
+        User user = new User(authentication);
+        DetailedPropertiesView detailedPropertiesView = platformUseCases.getDetailedProperties(platformKey, propertiesPath, user);
+        DetailedPropertiesOutput detailedPropertiesOutput = new DetailedPropertiesOutput(detailedPropertiesView);
+        return ResponseEntity.ok(detailedPropertiesOutput);
     }
 
     @GetMapping("/{application_name}/platforms/{platform_name}/properties/instance_model")

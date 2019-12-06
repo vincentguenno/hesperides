@@ -6,7 +6,7 @@ Feature: Get properties with details
   Scenario: get the properties details of a platform without properties
     Given an existing module
     And an existing platform with this module
-    When I get the detailed properties of this module
+    When I get the properties details of this module
     Then the properties details are successfully retrieved and they are empty
 
   Scenario: get the properties details of a platform with valued properties
@@ -21,7 +21,7 @@ Feature: Get properties with details
       | simple-property  | simple-value     |
       | another-property | {{stored-value}} |
       | stored-value     | final-value      |
-    When I get the detailed properties of this module
+    When I get the properties details of this module
     Then the properties details match these values
       | name             | storedValue      | finalValue   | defaultValue | transformations               |
       | stored-value     | final-value      | final-value  |              |                               |
@@ -38,7 +38,7 @@ Feature: Get properties with details
     And the platform has these valued properties
       | name                        | value |
       | overridden-default-property | 12    |
-    When I get the detailed properties of this module
+    When I get the properties details of this module
     Then the properties details match these values
       | name                        | storedValue | finalValue | defaultValue | transformations |
       | overridden-default-property | 12          | 12         | 42           |                 |
@@ -58,7 +58,7 @@ Feature: Get properties with details
       | name                    | value                |
       | global-property         | global-value         |
       | another-global-property | another-global-value |
-    When I get the detailed properties of this module
+    When I get the properties details of this module
     Then the properties details match these values
       | name                | storedValue                 | finalValue           | defaultValue | transformations               |
       | ref-global-property | {{another-global-property}} | another-global-value |              | PROPERTY_SUBSTITUTION_LEVEL_1 |
@@ -70,7 +70,7 @@ Feature: Get properties with details
       | name                    | value                       |
       | global-property         | {{another-global-property}} |
       | another-global-property | global-value                |
-    When I get the detailed properties of this platform
+    When I get the properties details of this platform
     Then the properties details match these values
       | name                    | storedValue                 | finalValue   | defaultValue | transformations                                     |
       | global-property         | {{another-global-property}} | global-value |              | OVERRIDDEN_BY_GLOBAL, PROPERTY_SUBSTITUTION_LEVEL_1 |
@@ -85,5 +85,5 @@ Feature: Get properties with details
     And the platform has these iterable properties
       | iterable          | bloc   | name          | value      |
       | iterable_property | bloc-1 | some-property | iterable_1 |
-    When I get the detailed properties of this module
+    When I get the properties details of this module
     Then the properties details are successfully retrieved and they are empty

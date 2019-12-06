@@ -32,7 +32,7 @@ public class GetPropertiesWithDetails extends HesperidesScenario implements En {
 
     public GetPropertiesWithDetails() {
 
-        When("^I get the detailed properties of this (platform|module)?$", (String platformOrModule) -> {
+        When("^I get the properties details of this (platform|module)?$", (String platformOrModule) -> {
 
             String propertiesPath;
             switch (platformOrModule) {
@@ -43,7 +43,7 @@ public class GetPropertiesWithDetails extends HesperidesScenario implements En {
                     propertiesPath = deployedModuleBuilder.buildPropertiesPath();
                     break;
                 default:
-                    throw new RuntimeException("You must choose between platform and module properties");
+                    throw new IllegalArgumentException("You must choose between platform and module properties");
             }
 
             platformClient.getPropertiesWithDetails(platformBuilder.buildInput(), propertiesPath);

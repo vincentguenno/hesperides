@@ -24,10 +24,8 @@ import org.hesperides.core.domain.platforms.exceptions.DuplicatePlatformExceptio
 import org.hesperides.core.domain.platforms.exceptions.PlatformNotFoundException;
 import org.hesperides.core.domain.platforms.queries.PlatformQueries;
 import org.hesperides.core.domain.platforms.queries.views.*;
-import org.hesperides.core.domain.platforms.queries.views.properties.AbstractValuedPropertyView;
-import org.hesperides.core.domain.platforms.queries.views.properties.GlobalPropertyUsageView;
-import org.hesperides.core.domain.platforms.queries.views.properties.PropertyWithDetailsView;
-import org.hesperides.core.domain.platforms.queries.views.properties.ValuedPropertyView;
+import org.hesperides.core.domain.platforms.queries.views.properties.*;
+import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.ModuleDetailedPropertiesView;
 import org.hesperides.core.domain.security.entities.User;
 import org.hesperides.core.domain.security.queries.ApplicationDirectoryGroupsQueries;
 import org.hesperides.core.domain.security.queries.views.ApplicationDirectoryGroupsView;
@@ -47,6 +45,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.logging.log4j.util.Strings.isBlank;
 import static org.hesperides.core.application.platforms.properties.PropertyType.GLOBAL;
 import static org.hesperides.core.application.platforms.properties.PropertyType.WITHOUT_MODEL;
@@ -206,7 +206,7 @@ public class PlatformUseCases {
                 .distinct()
                 .collect(Collectors.toList());
 
-        Map<Module.Key, List<Techno.Key>> technoKeysByModuleMap = allPlatformsModules.stream().collect(Collectors.toMap(
+        Map<Module.Key, List<Techno.Key>> technoKeysByModuleMap = allPlatformsModules.stream().collect(toMap(
                 ModuleView::getKey,
                 module -> module.getTechnos().stream()
                         .map(TechnoView::getKey)
@@ -225,7 +225,7 @@ public class PlatformUseCases {
                         .map(Map.Entry::getKey))
                 .collect(Collectors.toSet());
 
-        Map<Platform.Key, List<Module.Key>> moduleKeysByPlatformMap = platforms.stream().collect(Collectors.toMap(
+        Map<Platform.Key, List<Module.Key>> moduleKeysByPlatformMap = platforms.stream().collect(toMap(
                 PlatformView::getPlatformKey,
                 platform -> platform.getDeployedModules().stream()
                         .map(DeployedModuleView::getModuleKey)
@@ -412,22 +412,16 @@ public class PlatformUseCases {
     }
 
     public Map<String, Set<GlobalPropertyUsageView>> getGlobalPropertiesUsage(final Platform.Key platformKey) {
-        PlatformView platform = platformQueries.getOptionalPlatform(platformKey).orElseThrow(() -> new PlatformNotFoundException(platformKey));
+        PlatformView platform = getPlatform(platformKey);
 
         // On ne tient compte que des modules utilisés dans la platforme (pas des modules sauvegardés)
-        List<DeployedModuleView> deployedModules = platform.getActiveDeployedModules()
-                .collect(Collectors.toList());
-
-        List<TemplateContainer.Key> modulesKeys = deployedModules
-                .stream()
-                .map(DeployedModuleView::getModuleKey)
-                .collect(Collectors.toList());
-
-        List<ModulePropertiesView> modulesProperties = moduleQueries.getModulesProperties(modulesKeys);
+        List<DeployedModuleView> deployedModules = platform.getActiveDeployedModules().collect(Collectors.toList());
+        List<TemplateContainer.Key> moduleKeys = platform.getActiveDeployedModulesKeys();
+        List<ModulePropertiesView> modulesProperties = moduleQueries.getModulesProperties(moduleKeys);
 
         return platform.getGlobalProperties().stream()
                 .map(ValuedPropertyView::getName)
-                .collect(Collectors.toMap(Function.identity(), globalPropertyName ->
+                .collect(toMap(Function.identity(), globalPropertyName ->
                         GlobalPropertyUsageView.getGlobalPropertyUsage(globalPropertyName, deployedModules, modulesProperties)));
     }
 
@@ -533,5 +527,37 @@ public class PlatformUseCases {
     private String cleanCreatePlatform(Platform platform, User user) {
         eventCommands.cleanAggregateEvents(platform.getKey().generateHash());
         return platformCommands.createPlatform(platform, user);
+    }
+
+    public DetailedPropertiesView getDetailedProperties(Platform.Key platformKey, String propertiesPath, User user) {
+        PlatformView platform = getPlatform(platformKey);
+        boolean hidePasswords = platform.isProductionPlatform() && !user.hasProductionRoleForApplication(platform.getPlatformKey().getApplicationName());
+        // TODO: Gérer le cas des propriétés globales
+        List<TemplateContainer.Key> moduleKeys = platform.getActiveDeployedModulesKeys(propertiesPath);
+        Map<Module.Key, List<AbstractPropertyView>> propertiesByModuleKey = moduleQueries.getModulesProperties(moduleKeys)
+                .stream().collect(toMap(ModulePropertiesView::getModuleKey, ModulePropertiesView::getProperties));
+
+        List<ModuleDetailedPropertiesView> modulesDetailedProperties = platform.getActiveDeployedModules()
+                .filter(deployedModule -> isEmpty(propertiesPath) || deployedModule.getPropertiesPath().equals(propertiesPath))
+                .map(deployedModule -> {
+                    PropertyVisitorsSequence propertyVisitorsSequence = buildModulePropertyVisitorsSequence(
+                            platform,
+                            deployedModule.getModulePath(),
+                            deployedModule.getModuleKey(),
+                            propertiesByModuleKey.get(deployedModule.getModuleKey()),
+                            null, hidePasswords);
+                    return new ModuleDetailedPropertiesView(
+                            deployedModule.getModuleKey(),
+                            deployedModule.getModulePath(),
+                            deployedModule.getPropertiesPath(),
+                            propertyVisitorsSequence.toModuleDetailedProperties());
+                })
+                .collect(Collectors.toList());
+
+        return new DetailedPropertiesView(
+                platform.getApplicationName(),
+                platform.getPlatformName(),
+                Collections.emptyList(),
+                modulesDetailedProperties);
     }
 }

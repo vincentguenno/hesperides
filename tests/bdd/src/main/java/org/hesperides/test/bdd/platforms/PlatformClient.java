@@ -26,6 +26,7 @@ import org.hesperides.core.presentation.io.platforms.InstancesModelOutput;
 import org.hesperides.core.presentation.io.platforms.ModulePlatformsOutput;
 import org.hesperides.core.presentation.io.platforms.PlatformIO;
 import org.hesperides.core.presentation.io.platforms.SearchResultOutput;
+import org.hesperides.core.presentation.io.platforms.properties.DetailedPropertiesOutput;
 import org.hesperides.core.presentation.io.platforms.properties.GlobalPropertyUsageOutput;
 import org.hesperides.core.presentation.io.platforms.properties.PropertiesIO;
 import org.hesperides.core.presentation.io.platforms.properties.PropertiesWithDetailsOutput;
@@ -282,5 +283,14 @@ public class PlatformClient {
                 getResponseType(tryTo, PlatformIO.class),
                 platformInput.getApplicationName(),
                 platformInput.getPlatformName());
+    }
+
+    public void getDetailedProperties(PlatformIO platformInput, String propertiesPath) {
+        restTemplate.getForEntity(
+                "/applications/{application_name}/platforms/{platform_name}/detailed_properties?properties_path={properties_path}",
+                DetailedPropertiesOutput.class,
+                platformInput.getApplicationName(),
+                platformInput.getPlatformName(),
+                propertiesPath);
     }
 }

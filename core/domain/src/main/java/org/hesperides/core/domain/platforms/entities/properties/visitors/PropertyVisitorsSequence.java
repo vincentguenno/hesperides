@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hesperides.core.domain.platforms.entities.properties.ValuedPropertyTransformation;
 import org.hesperides.core.domain.platforms.entities.properties.diff.PropertiesDiff;
 import org.hesperides.core.domain.platforms.queries.views.properties.AbstractValuedPropertyView;
+import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.ModuleDetailedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.IterableValuedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.PropertyWithDetailsView;
 import org.hesperides.core.domain.platforms.queries.views.properties.ValuedPropertyView;
@@ -226,6 +227,15 @@ public class PropertyVisitorsSequence {
                 .filter(SimplePropertyVisitor.class::isInstance)
                 .map(SimplePropertyVisitor.class::cast)
                 .map(SimplePropertyVisitor::getPropertyWithDetails)
+                .collect(Collectors.toList());
+    }
+
+    public List<ModuleDetailedPropertyView> toModuleDetailedProperties() {
+        return properties.stream()
+                // On ne gère pour l'instant que les propriétés simples
+                .filter(SimplePropertyVisitor.class::isInstance)
+                .map(SimplePropertyVisitor.class::cast)
+                .map(SimplePropertyVisitor::toModuleDetailedProperty)
                 .collect(Collectors.toList());
     }
 }
