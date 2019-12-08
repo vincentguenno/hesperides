@@ -26,6 +26,7 @@ import org.hesperides.core.domain.platforms.queries.PlatformQueries;
 import org.hesperides.core.domain.platforms.queries.views.*;
 import org.hesperides.core.domain.platforms.queries.views.properties.AbstractValuedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView;
+import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.DetailedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.ModuleDetailedPropertiesView;
 import org.hesperides.core.domain.platforms.queries.views.properties.GlobalPropertyUsageView;
 import org.hesperides.core.domain.platforms.queries.views.properties.ValuedPropertyView;
@@ -520,6 +521,9 @@ public class PlatformUseCases {
         Map<Module.Key, List<AbstractPropertyView>> propertiesByModuleKey = moduleQueries.getModulesProperties(moduleKeys)
                 .stream().collect(toMap(ModulePropertiesView::getModuleKey, ModulePropertiesView::getProperties));
 
+        PropertyVisitorsSequence globalPropertyVisitorsSequence = buildPropertyVisitorsSequenceForGlobals(platform);
+        List<DetailedPropertyView> globalProperties = globalPropertyVisitorsSequence.toGlobalDetailedProperties();
+
         List<ModuleDetailedPropertiesView> modulesDetailedProperties = platform.getActiveDeployedModules()
                 .filter(deployedModule -> isEmpty(propertiesPath) || deployedModule.getPropertiesPath().equals(propertiesPath))
                 .map(deployedModule -> {
@@ -533,7 +537,7 @@ public class PlatformUseCases {
                             deployedModule.getModuleKey(),
                             deployedModule.getModulePath(),
                             deployedModule.getPropertiesPath(),
-                            propertyVisitorsSequence.toModuleDetailedProperties(platform.getGlobalProperties()));
+                            propertyVisitorsSequence.toModuleDetailedProperties(globalProperties));
                 })
                 .collect(Collectors.toList());
 

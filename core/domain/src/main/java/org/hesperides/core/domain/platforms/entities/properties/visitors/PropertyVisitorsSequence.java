@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hesperides.core.domain.platforms.entities.properties.ValuedPropertyTransformation;
 import org.hesperides.core.domain.platforms.entities.properties.diff.PropertiesDiff;
 import org.hesperides.core.domain.platforms.queries.views.properties.AbstractValuedPropertyView;
+import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.DetailedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.ModuleDetailedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.IterableValuedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.ValuedPropertyView;
@@ -220,12 +221,20 @@ public class PropertyVisitorsSequence {
                         propertyVisitor.equals(propertyVisitorMap.get(propertyVisitor.getName()), comparisonMode));
     }
 
-    public List<ModuleDetailedPropertyView> toModuleDetailedProperties(List<ValuedPropertyView> globalProperties) {
+    public List<ModuleDetailedPropertyView> toModuleDetailedProperties(List<DetailedPropertyView> globalProperties) {
         return properties.stream()
                 // On ne gère pour l'instant que les propriétés simples
                 .filter(SimplePropertyVisitor.class::isInstance)
                 .map(SimplePropertyVisitor.class::cast)
                 .map(simplePropertyVisitor -> simplePropertyVisitor.toModuleDetailedProperty(globalProperties))
+                .collect(Collectors.toList());
+    }
+
+    public List<DetailedPropertyView> toGlobalDetailedProperties() {
+        return properties.stream()
+                .filter(SimplePropertyVisitor.class::isInstance)
+                .map(SimplePropertyVisitor.class::cast)
+                .map(SimplePropertyVisitor::toGlobalDetailedProperty)
                 .collect(Collectors.toList());
     }
 }

@@ -136,15 +136,15 @@ Feature: Get detailed properties
       | property-without-value |             |            |              | false      | false      |         |         |                          | false     |
 
   Scenario: get the detail of a property that is not referenced in any template
-    Given an existing module
-    Given an existing platform with this module
-    And the platform has these valued properties
-      | name              | value          |
-      | not-used-property | not-used-value |
-    When I get the detailed properties of this module
-    Then the detailed properties of this module are
-      | name              | storedValue    | finalValue     | defaultValue | isRequired | isPassword | pattern | comment | referencedGlobalProperty | isNotUsed |
-      | not-used-property | not-used-value | not-used-value |              | false      | false      |         |         |                          | true      |
+#    Given an existing module
+#    Given an existing platform with this module
+#    And the platform has these valued properties
+#      | name              | value          |
+#      | not-used-property | not-used-value |
+#    When I get the detailed properties of this module
+#    Then the detailed properties of this module are
+#      | name              | storedValue    | finalValue     | defaultValue | isRequired | isPassword | pattern | comment | referencedGlobalProperty | isNotUsed |
+#      | not-used-property | not-used-value | not-used-value |              | false      | false      |         |         |                          | true      |
 
   Scenario: get the detail of property with multiple models
 

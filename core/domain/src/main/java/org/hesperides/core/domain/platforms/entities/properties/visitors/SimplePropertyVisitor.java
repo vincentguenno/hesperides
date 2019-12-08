@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.hesperides.core.domain.platforms.entities.properties.ValuedPropertyTransformation;
 import org.hesperides.core.domain.platforms.entities.properties.diff.PropertiesDiff.ComparisonMode;
+import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.DetailedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.DetailedPropertiesView.ModuleDetailedPropertyView;
 import org.hesperides.core.domain.platforms.queries.views.properties.ValuedPropertyView;
 import org.hesperides.core.domain.templatecontainers.queries.AbstractPropertyView;
@@ -154,7 +155,7 @@ public class SimplePropertyVisitor implements PropertyVisitor {
         return Objects.hash(propertyModels, propertyValue);
     }
 
-    public ModuleDetailedPropertyView toModuleDetailedProperty(List<ValuedPropertyView> globalProperties) {
+    public ModuleDetailedPropertyView toModuleDetailedProperty(List<DetailedPropertyView> globalProperties) {
         String finalValue = getValueOrDefault().orElse(null);
         String defaultValue = getDefaultValue().orElse(null);
         return new ModuleDetailedPropertyView(
@@ -164,5 +165,13 @@ public class SimplePropertyVisitor implements PropertyVisitor {
                 defaultValue,
                 propertyModels,
                 globalProperties);
+    }
+
+    public DetailedPropertyView toGlobalDetailedProperty() {
+        String finalValue = getValueOrDefault().orElse(null);
+        return new DetailedPropertyView(
+                getName(),
+                initialValue,
+                finalValue);
     }
 }

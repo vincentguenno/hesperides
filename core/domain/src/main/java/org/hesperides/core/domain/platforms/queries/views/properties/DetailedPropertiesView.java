@@ -24,9 +24,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.hesperides.core.domain.modules.entities.Module;
+import org.hesperides.core.domain.platforms.entities.properties.ValuedProperty;
 import org.hesperides.core.domain.templatecontainers.queries.PropertyView;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -73,15 +74,33 @@ public class DetailedPropertiesView {
                 String finalValue,
                 String defaultValue,
                 List<PropertyView> propertyModels,
-                List<ValuedPropertyView> globalProperties) {
+                List<DetailedPropertyView> globalProperties) {
             super(name, storedValue, finalValue);
             this.defaultValue = defaultValue;
             this.isRequired = !isEmpty(propertyModels) && propertyModels.get(0).isRequired();
             this.isPassword = !isEmpty(propertyModels) && propertyModels.get(0).isPassword();
             this.pattern = isEmpty(propertyModels) ? null : propertyModels.get(0).getPattern();
             this.comment = isEmpty(propertyModels) ? null : propertyModels.get(0).getComment();
-            this.referencedGlobalProperties = Collections.emptyList();
+            this.referencedGlobalProperties = getReferencedGlobalProperties(globalProperties);
             this.isNotUsed = false;
+        }
+
+        // Soit le nom est identique à celui d'une propriété globale,
+        // soit sa valeur comtient une référence à une ou plusieurs propriétés globales
+        private List<DetailedPropertyView> getReferencedGlobalProperties(List<DetailedPropertyView> globalProperties) {
+            List<DetailedPropertyView> referencedGlobalProperties = new ArrayList<>();
+            globalProperties.forEach(globalProperty -> {
+                if (globalProperty.getName().equals(getName())) {
+                    referencedGlobalProperties.add(globalProperty);
+                }
+                ValuedProperty.extractValuesBetweenCurlyBrackets(getStoredValue()).forEach(extractedProperty -> {
+                    if (extractedProperty.equals(globalProperty.getName())) {
+                        referencedGlobalProperties.add(globalProperty);
+                    }
+                });
+            });
+
+            return referencedGlobalProperties;
         }
     }
 }
