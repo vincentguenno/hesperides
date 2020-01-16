@@ -45,6 +45,7 @@ Le traitement à exécuter consiste à comparer les évènements n et n-1 afin d
     {
         author: "",
         comment: "",
+        timestamp: "2017-03-02T09:56:59.280Z",
         added_properties: ["property-1", "property-2", ...],
         updated_properties: [
             {
