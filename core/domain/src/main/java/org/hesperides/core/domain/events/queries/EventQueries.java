@@ -36,6 +36,7 @@ public class EventQueries extends AxonQueries {
         return createEventPage(events, pageable);
     }
 
+    // TODO voir si il existe un moyen d'utiliser une page directement.
     private List<EventView> createEventPage(final List<EventView> events, final Pageable pageable) {
         // TODO utiliser le sort du pageable
         return events.stream().sorted(Comparator.comparing(EventView::getTimestamp).reversed())
